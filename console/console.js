@@ -232,6 +232,63 @@
       requested === 'light' || requested === 'dark' ? requested : prefersLight ? 'light' : 'dark'
   }
 
+  // Tokens this stylesheet consumes. tokens.css ships a copy of the values dsh
+  // was built with; when the host embeds us, we re-read the live ones so the
+  // console keeps matching a shell that has since been restyled. Deliberately
+  // an allow-list rather than a sweep of every --dsw-* property: a fixed list
+  // cannot pick up something unexpected and repaint the page with it.
+  const HOST_TOKENS = [
+    '--dsw-radius-sm',
+    '--dsw-radius-md',
+    '--dsw-focus-ring-width',
+    '--dsw-font-family',
+    '--dsh-content-font-size',
+    '--dsh-content-font-size-secondary',
+    '--dsw-alias-bg-base',
+    '--dsw-alias-bg-layer-1',
+    '--dsw-alias-bg-layer-2',
+    '--dsw-alias-bg-layer-3',
+    '--dsw-alias-border-l2',
+    '--dsw-alias-border-l3',
+    '--dsw-alias-border-l4',
+    '--dsw-alias-label-primary',
+    '--dsw-alias-label-secondary',
+    '--dsw-alias-label-tertiary',
+    '--dsw-alias-label-caption',
+    '--dsw-alias-label-primary-foreground',
+    '--dsw-alias-brand-primary',
+    '--dsw-alias-button-primary-hover',
+    '--dsw-alias-button-ghost-active-fill',
+    '--dsw-alias-button-elevated-fill',
+    '--dsw-alias-interactive-bg-hover',
+    '--dsw-alias-interactive-bg-hover-solid',
+    '--dsw-alias-interactive-bg-active',
+    '--dsw-alias-link',
+    '--dsw-alias-state-success-primary',
+    '--dsw-alias-state-warn-primary',
+    '--dsw-alias-state-error-primary',
+    '--dsw-alias-toast-bg',
+  ]
+
+  function syncHostTokens() {
+    let hostDocument = null
+    try {
+      if (window.parent === window) return
+      hostDocument = window.parent.document
+      if (!hostDocument?.body) return
+    } catch {
+      return // cross-origin parent: keep the values tokens.css shipped with
+    }
+    const computed = window.parent.getComputedStyle(hostDocument.body)
+    const style = document.documentElement.style
+    for (const name of HOST_TOKENS) {
+      const value = computed.getPropertyValue(name).trim()
+      if (value) style.setProperty(name, value)
+    }
+  }
+
+  syncHostTokens()
+
   /** @type {any} */
   let state = null
   /** Reference images queued for the next generation (absolute paths). */
@@ -676,6 +733,10 @@
     )
 
     $('sel-lang').addEventListener('change', (event) => {
+      // Chrome restores form state on reload and dispatches a synthetic change
+      // for it, which used to overwrite the saved preference with whatever the
+      // picker happened to be showing. Only a real pick should persist.
+      if (!event.isTrusted) return
       const choice = event.target.value
       // Apply immediately so the page never lags behind the picker, then save;
       // the saved value decides what the next load resolves to.

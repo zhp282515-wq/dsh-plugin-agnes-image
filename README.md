@@ -197,6 +197,7 @@ dsh-plugin-agnes-image/
 │   └── routes.js         the HTTP API, including the origin fence
 ├── client/index.js       browser half: one settings.section registration
 ├── console/              the console page: plain HTML, CSS and DOM, no build step
+│   └── tokens.css        dsh's own design tokens, so the console looks native
 ├── test/                 node --test, no network
 └── scripts/              manual smoke tests that hit the live API
 ```
@@ -215,6 +216,24 @@ reasons:
   between releases.
 - It is a plain URL. It can be opened in a tab, reloaded, and screenshotted by a
   headless browser during development.
+
+### Why the console looks like a settings page
+
+It wears dsh's own design tokens rather than a palette of its own, so it reads as
+one more section of the settings panel instead of a bolted-on web page.
+
+`console/tokens.css` is a verbatim copy of the harness's `--dsw-static-*` palette
+and its light/dark `--dsw-alias-*` aliases. `console.css` maps a short internal
+vocabulary (`--bg`, `--panel`, `--text`, `--accent`, …) onto those aliases, which
+means the whole page re-skins from one block. Nothing in the layout depends on a
+particular colour, and one column of full-width cards means no card can be
+squeezed next to a shorter neighbour or clipped by a sticky one.
+
+When the page is embedded, `console.js` re-reads those tokens off the host
+document and writes the live values over the copy. A dsh that has since been
+restyled therefore restyles the console with it. That sync uses an allow-list of
+the tokens the stylesheet actually consumes — a fixed list cannot pick up some
+unrelated property and repaint the page with it.
 
 ## Notes from the field
 

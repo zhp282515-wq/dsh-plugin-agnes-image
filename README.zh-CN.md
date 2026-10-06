@@ -181,6 +181,7 @@ dsh-plugin-agnes-image/
 │   └── routes.js         HTTP 接口，含同源防护
 ├── client/index.js       浏览器半边：只注册一个 settings.section
 ├── console/              控制台页面：纯 HTML / CSS / DOM，无构建步骤
+│   └── tokens.css        dsh 自己的设计 token，让控制台看起来是原生的
 ├── test/                 node --test，不联网
 └── scripts/              手动执行、会打真实接口的冒烟脚本
 ```
@@ -195,6 +196,20 @@ dsh-plugin-agnes-image/
 - 槽位本身只依赖 `react`。不依赖 client store、不依赖 UI-primitives 的组件签名、
   也不依赖会在版本间漂移的样式约定。
 - 它就是一个普通 URL：可以在标签页里打开、刷新，开发时还能用无头浏览器截图。
+
+### 为什么控制台长得像设置页
+
+它穿的是 dsh 自己的设计 token，而不是自带的配色，所以看起来就是设置面板里的又一个分区，
+而不是一个外挂网页。
+
+`console/tokens.css` 是宿主 `--dsw-static-*` 调色板与浅色/深色两套 `--dsw-alias-*` 别名的
+逐字副本。`console.css` 把一套简短的内部变量（`--bg`、`--panel`、`--text`、`--accent` …）
+映射到这些别名上，于是整页换肤只改一个块。布局不依赖任何具体颜色；单列满宽卡片意味着
+没有卡片会被挤在更矮的邻居旁边，也不会被吸顶元素盖住。
+
+页面被嵌入时，`console.js` 会从宿主文档重新读一遍这些 token 并覆盖副本，所以之后被重新
+配色的 dsh 会连带把控制台一起换掉。这个同步用的是一份白名单（只含样式表真正消费的 token）
+——固定清单不会顺手捎上某个无关属性把整页刷成别的样子。
 
 ## 踩过的坑
 
