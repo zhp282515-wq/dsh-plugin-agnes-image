@@ -111,8 +111,10 @@ window.__ModuleLoader__.load({
           style: {
             width: '100%',
             minHeight: 560,
-            border: '1px solid var(--dsw-alias-border-l2, rgba(128, 128, 128, 0.28))',
-            borderRadius: 10,
+            // No border and no radius. The console paints the harness' own page
+            // background inside itself, so a ring drawn out here reads as a box
+            // wrapped around the section rather than as part of the settings page.
+            border: 'none',
             background: 'transparent',
             display: 'block',
           },

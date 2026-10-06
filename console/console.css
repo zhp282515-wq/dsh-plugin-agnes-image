@@ -110,6 +110,15 @@ code {
   padding: 28px 24px 72px;
 }
 
+/* Embedded in the settings page — console.js sets this once it can read the
+   host document — the console is a section among sections, not a page of its
+   own, so it drops the page inset and the centring column. */
+html[data-embedded] .app {
+  max-width: none;
+  margin: 0;
+  padding: 0 0 8px;
+}
+
 .topbar {
   display: flex;
   align-items: center;

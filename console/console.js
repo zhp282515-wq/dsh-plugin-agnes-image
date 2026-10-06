@@ -285,6 +285,9 @@
       const value = computed.getPropertyValue(name).trim()
       if (value) style.setProperty(name, value)
     }
+    // Embedded, the console is one section among many: the stylesheet drops the
+    // page-shaped inset it needs when it is opened on its own.
+    document.documentElement.dataset.embedded = 'true'
   }
 
   syncHostTokens()
