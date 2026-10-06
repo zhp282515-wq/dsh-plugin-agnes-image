@@ -271,10 +271,12 @@ html[data-embedded] .app {
   gap: 8px;
   align-items: center;
   flex-wrap: wrap;
-}
-
-.row + .row {
-  margin-top: 10px;
+  /* Space above every row rather than only after another row. The Generate
+     card has a .refs list between two rows, and an empty one is display:none,
+     so the adjacency rule never matched and "add reference image" ended up
+     glued to "generate". Sibling margins collapse, so a .field above still
+     contributes its own 12px instead of adding to this. */
+  margin-top: 12px;
 }
 
 .row.tight {
