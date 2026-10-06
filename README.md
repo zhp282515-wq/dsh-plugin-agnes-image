@@ -52,6 +52,19 @@ and renders a model-readable summary that includes a Markdown image reference.
 | Generate | A full workbench: preset, prompt, size, ratio, model, reference-image upload, result preview |
 | History | A thumbnail gallery of everything generated, from the tool or from the console |
 
+The console speaks **English and Chinese**, switched from the picker in its top
+bar. The settings-section label follows the shell's own language, so the section
+is listed as *Agnes Image* or *Agnes 生图* depending on what dsh is using.
+`Auto` (the default) means "follow the shell, then the browser"; an explicit
+`English` or `中文` pins it and is remembered across restarts.
+
+<details>
+<summary>The same console in Chinese</summary>
+
+![中文控制台](docs/console.zh-CN.png)
+
+</details>
+
 Every change takes effect on the next generation — no restart, no remount. The
 plugin merges its effective configuration at call time from (highest first) the
 operator's patch-row config, the console's saved settings, and built-in defaults.
@@ -241,13 +254,20 @@ Things that cost time, written down so they cost nobody else any:
 ## Development
 
 ```bash
-node --test test/*.test.mjs          # 42 tests, no network, no dsh
+node --test test/*.test.mjs          # 54 tests, no network, no dsh
 ```
 
 The suite covers the parts that fail silently or dangerously: the origin fence,
 settings validation and round-trips, history tolerance for corrupt lines, the
 native-pixel table's internal consistency, and the browser half's loader
 envelope and slot registration (executed in a `vm` with a stub shell).
+
+`test/i18n.test.mjs` is worth a note: it reads `console.js` as text and fails the
+build on a missing translation, a key with no `zh` counterpart, a `{placeholder}`
+that exists in one language but not the other, a dead entry nobody references —
+or a user-visible sentence hidden in a string literal or in a CSS `content:`.
+Both of those last two shipped once and were caught by eye in a screenshot, which
+is exactly the review that should not be manual.
 
 Smoke tests hit the live API and are run by hand:
 
@@ -257,18 +277,27 @@ node scripts/smoke-image-to-image.mjs <reference.png>
 node scripts/smoke-tool.mjs
 ```
 
-To screenshot the console while iterating:
+To iterate on the console, skip dsh entirely — the page is served by the plugin's
+own routes, so it can run standalone against the same settings file:
+
+```bash
+node scripts/preview-console.mjs               # http://127.0.0.1:8791/agnes-image/console
+node scripts/preview-console.mjs --port 9000
+```
+
+Then screenshot it:
 
 ```bash
 chrome --headless=new --disable-gpu --hide-scrollbars \
-  --window-size=1500,1000 --virtual-time-budget=8000 \
-  --screenshot=console.png "http://127.0.0.1:19387/agnes-image/console?theme=dark"
+  --window-size=1500,1420 --virtual-time-budget=9000 \
+  --screenshot=console.png "http://127.0.0.1:8791/agnes-image/console?theme=dark&lang=zh"
 ```
 
 `?theme=light|dark` overrides the palette; without it the page follows the OS.
 The host passes the shell's theme when it embeds the page, because inside an
 iframe `prefers-color-scheme` tracks the operating system rather than the
-application.
+application. `?lang=en|zh` works the same way, but only while the saved
+preference is `Auto` — an explicit choice always wins over the shell's hint.
 
 ## License
 

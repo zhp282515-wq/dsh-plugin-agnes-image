@@ -36,15 +36,16 @@ function makeReact() {
 }
 
 /** Load the browser half exactly the way the shell does. */
-function bootstrap({ dark = false, quiet = false } = {}) {
+function bootstrap({ dark = false, quiet = false, lang = 'en-US' } = {}) {
   let loaded = null
   const complaints = []
   const context = vm.createContext({
     window: { __ModuleLoader__: { load: (mod) => { loaded = mod } } },
     document: {
       body: { hasAttribute: (name) => dark && name === 'data-ds-dark-theme' },
-      documentElement: { dataset: {} },
+      documentElement: { dataset: {}, lang },
     },
+    navigator: { language: lang, languages: [lang] },
     console: quiet ? { ...console, error: (...args) => complaints.push(args) } : console,
     URLSearchParams,
   })
@@ -158,7 +159,7 @@ test('the section embeds the console page served by the host half', () => {
   assert.equal(iframes.length, 1, 'exactly one iframe')
 
   const src = iframes[0].props.src
-  assert.equal(src, '/agnes-image/console?theme=light')
+  assert.equal(src, '/agnes-image/console?theme=light&lang=en')
   assert.ok(src.startsWith('/'), 'must be a relative URL: the loopback port is random')
   assert.equal(iframes[0].props.title, 'Agnes Image console')
 
@@ -180,8 +181,38 @@ test('the embedded console is told which theme the shell is using', () => {
     return findAll(tree, (n) => n.type === 'iframe')[0].props.src
   }
 
-  assert.ok(srcFor(light).endsWith('theme=light'))
-  assert.ok(srcFor(dark).endsWith('theme=dark'))
+  assert.ok(srcFor(light).includes('theme=light'))
+  assert.ok(srcFor(dark).includes('theme=dark'))
+})
+
+test('the embedded console is told which language the shell is using', () => {
+  const srcFor = (options) => {
+    const { exports } = bootstrap(options)
+    const { ctx, registrations } = makeSlotContext()
+    exports.apply(ctx)
+    const tree = registrations[0].component()
+    return findAll(tree, (n) => n.type === 'iframe')[0].props.src
+  }
+
+  // The iframe cannot see the application locale itself, so the host page has
+  // to pass it down — otherwise the console falls back to the OS language.
+  assert.ok(srcFor({ lang: 'zh-CN' }).endsWith('lang=zh'))
+  assert.ok(srcFor({ lang: 'zh-Hans' }).endsWith('lang=zh'))
+  assert.ok(srcFor({ lang: 'en-US' }).endsWith('lang=en'))
+  assert.ok(srcFor({ lang: 'fr' }).endsWith('lang=en'), 'anything not Chinese reads as English')
+})
+
+test('the settings section is labelled in the shell language', () => {
+  const labelFor = (lang) => {
+    const { exports } = bootstrap({ lang })
+    const { ctx, registrations } = makeSlotContext()
+    exports.apply(ctx)
+    return registrations[0].options.label
+  }
+
+  // Still a function: the shell re-reads it on every projection.
+  assert.equal(labelFor('en-US')(), 'Agnes Image')
+  assert.equal(labelFor('zh-CN')(), 'Agnes 生图')
 })
 
 // ---------------------------------------------------------------------------

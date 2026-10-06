@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="/agnes-image/console.css" />
   </head>
   <body>
+    <!--
+      Every visible string carries a data-i18n* hook and is filled in by
+      console.js from its dictionary. Nothing here is hard-coded English, so
+      switching languages never needs a reload.
+    -->
     <div class="app">
       <header class="topbar">
         <div class="brand">
@@ -19,14 +24,19 @@
             </svg>
           </span>
           <div class="brand-text">
-            <h1>Agnes Image</h1>
-            <p id="brand-sub">Loading…</p>
+            <h1 data-i18n="app.name">Agnes Image</h1>
+            <p id="brand-sub" data-i18n="boot.loading">Loading…</p>
           </div>
         </div>
         <div class="topbar-actions">
-          <span id="key-pill" class="pill pill-muted">key: unknown</span>
-          <button id="btn-open-tab" class="btn btn-ghost" type="button">Open in tab</button>
-          <button id="btn-reload" class="btn btn-ghost" type="button">Reload</button>
+          <select id="sel-lang" data-i18n-title="lang.title">
+            <option value="auto" data-i18n="lang.auto">Auto</option>
+            <option value="en" data-i18n="lang.en">English</option>
+            <option value="zh" data-i18n="lang.zh">中文</option>
+          </select>
+          <span id="key-pill" class="pill pill-muted" data-i18n="key.unknown">key: unknown</span>
+          <button id="btn-open-tab" class="btn btn-ghost" type="button" data-i18n="action.openTab">Open in tab</button>
+          <button id="btn-reload" class="btn btn-ghost" type="button" data-i18n="action.reload">Reload</button>
         </div>
       </header>
 
@@ -35,24 +45,24 @@
         <div class="column">
           <section class="card" id="card-model">
             <div class="card-head">
-              <h2>Active model</h2>
-              <p>The model the <code>agnes_image</code> tool uses unless a call overrides it.</p>
+              <h2 data-i18n="model.title">Active model</h2>
+              <p data-i18n-html="model.desc">The model the <code>agnes_image</code> tool uses unless a call overrides it.</p>
             </div>
             <div id="models-list" class="models"></div>
           </section>
 
           <section class="card">
             <div class="card-head">
-              <h2>Defaults</h2>
-              <p>Applied to every generation that does not name its own values.</p>
+              <h2 data-i18n="defaults.title">Defaults</h2>
+              <p data-i18n="defaults.desc">Applied to every generation that does not name its own values.</p>
             </div>
             <div class="fields">
               <label class="field">
-                <span class="field-label">Size tier</span>
+                <span class="field-label" data-i18n="defaults.size">Size tier</span>
                 <select id="sel-size"></select>
               </label>
               <label class="field">
-                <span class="field-label">Aspect ratio</span>
+                <span class="field-label" data-i18n="defaults.ratio">Aspect ratio</span>
                 <select id="sel-ratio"></select>
               </label>
             </div>
@@ -61,73 +71,73 @@
 
           <section class="card">
             <div class="card-head">
-              <h2>Output</h2>
-              <p>Where generated PNG files are written.</p>
+              <h2 data-i18n="output.title">Output</h2>
+              <p data-i18n="output.desc">Where generated PNG files are written.</p>
             </div>
             <div class="row">
-              <input id="in-outdir" class="input grow" type="text" spellcheck="false" placeholder="/path/to/output" />
-              <button id="btn-reveal" class="btn" type="button">Open folder</button>
+              <input id="in-outdir" class="input grow" type="text" spellcheck="false" data-i18n-placeholder="output.placeholder" placeholder="/path/to/output" />
+              <button id="btn-reveal" class="btn" type="button" data-i18n="action.openFolder">Open folder</button>
             </div>
             <p class="hint" id="outdir-hint"></p>
           </section>
 
           <section class="card">
             <div class="card-head">
-              <h2>API key</h2>
-              <p>The key is never sent back to this page — only its source and a masked fingerprint.</p>
+              <h2 data-i18n="key.title">API key</h2>
+              <p data-i18n="key.desc">The key is never sent back to this page — only its source and a masked fingerprint.</p>
             </div>
             <div class="key-row">
               <span class="key-masked" id="key-masked">—</span>
               <span class="hint inline" id="key-source"></span>
             </div>
             <div class="row">
-              <input id="in-key" class="input grow" type="password" spellcheck="false" autocomplete="off" placeholder="Paste a new API key to replace the stored one" />
-              <button id="btn-key-save" class="btn btn-primary" type="button">Save key</button>
-              <button id="btn-key-clear" class="btn btn-danger" type="button">Clear</button>
+              <input id="in-key" class="input grow" type="password" spellcheck="false" autocomplete="off" data-i18n-placeholder="key.placeholder" placeholder="Paste a new API key to replace the stored one" />
+              <button id="btn-key-save" class="btn btn-primary" type="button" data-i18n="action.saveKey">Save key</button>
+              <button id="btn-key-clear" class="btn btn-danger" type="button" data-i18n="action.clear">Clear</button>
             </div>
             <div class="row">
-              <button id="btn-key-test" class="btn" type="button">Test connection</button>
-              <button id="btn-key-test-gen" class="btn btn-ghost" type="button">Test with a real generation</button>
+              <button id="btn-key-test" class="btn" type="button" data-i18n="action.testConnection">Test connection</button>
+              <button id="btn-key-test-gen" class="btn btn-ghost" type="button" data-i18n="action.testGenerate">Test with a real generation</button>
             </div>
             <p class="hint" id="test-result"></p>
           </section>
 
           <section class="card">
             <div class="card-head">
-              <h2>Advanced</h2>
-              <p>Timeouts, retries and the endpoint. Leave the endpoint empty for the default.</p>
+              <h2 data-i18n="advanced.title">Advanced</h2>
+              <p data-i18n="advanced.desc">Timeouts, retries and the endpoint. Leave the endpoint empty for the default.</p>
             </div>
             <div class="fields">
               <label class="field">
-                <span class="field-label">Timeout (ms)</span>
+                <span class="field-label" data-i18n="advanced.timeout">Timeout (ms)</span>
                 <input id="in-timeout" class="input" type="number" min="10000" max="3600000" step="1000" />
               </label>
               <label class="field">
-                <span class="field-label">Retries</span>
+                <span class="field-label" data-i18n="advanced.retries">Retries</span>
                 <input id="in-retries" class="input" type="number" min="0" max="10" step="1" />
               </label>
             </div>
             <label class="field">
-              <span class="field-label">Endpoint</span>
+              <span class="field-label" data-i18n="advanced.endpoint">Endpoint</span>
               <input id="in-endpoint" class="input" type="text" spellcheck="false" placeholder="https://apihub.agnes-ai.com/v1/images/generations" />
             </label>
             <label class="check">
               <input id="chk-history" type="checkbox" />
-              <span>Record every generated image in the history</span>
+              <span data-i18n="advanced.history">Record every generated image in the history</span>
             </label>
           </section>
 
           <section class="card">
             <div class="card-head">
-              <h2>Prompt presets</h2>
-              <p>Reusable prompts, offered in the Generate panel.</p>
+              <h2 data-i18n="presets.title">Prompt presets</h2>
+              <p data-i18n="presets.desc">Reusable prompts, offered in the Generate panel.</p>
             </div>
             <div id="presets-list" class="presets"></div>
             <div class="preset-form">
-              <input id="in-preset-name" class="input" type="text" placeholder="Preset name" spellcheck="false" />
-              <textarea id="in-preset-prompt" class="input" rows="3" placeholder="Prompt text"></textarea>
+              <input id="in-preset-name" class="input" type="text" data-i18n-placeholder="presets.namePlaceholder" placeholder="Preset name" spellcheck="false" />
+              <textarea id="in-preset-prompt" class="input" rows="3" data-i18n-placeholder="presets.promptPlaceholder" placeholder="Prompt text"></textarea>
               <div class="row">
-                <button id="btn-preset-add" class="btn" type="button">Add preset</button>
+                <button id="btn-preset-add" class="btn" type="button" data-i18n="action.addPreset">Add preset</button>
               </div>
             </div>
           </section>
@@ -137,16 +147,16 @@
         <div class="column">
           <section class="card card-sticky">
             <div class="card-head">
-              <h2>Generate</h2>
-              <p>Runs through the same client the tool uses.</p>
+              <h2 data-i18n="generate.title">Generate</h2>
+              <p data-i18n="generate.desc">Runs through the same client the tool uses.</p>
             </div>
             <label class="field">
-              <span class="field-label">Preset</span>
+              <span class="field-label" data-i18n="generate.preset">Preset</span>
               <select id="sel-preset"></select>
             </label>
             <label class="field">
-              <span class="field-label">Prompt</span>
-              <textarea id="gen-prompt" class="input" rows="5" placeholder="[subject] + [scene] + [style] + [lighting] + [composition] + [quality]"></textarea>
+              <span class="field-label" data-i18n="generate.prompt">Prompt</span>
+              <textarea id="gen-prompt" class="input" rows="5" data-i18n-placeholder="generate.promptPlaceholder" placeholder="[subject] + [scene] + [style] + [lighting] + [composition] + [quality]"></textarea>
             </label>
             <div class="row">
               <select id="gen-size" class="compact"></select>
@@ -154,16 +164,16 @@
               <select id="gen-model" class="grow"></select>
             </div>
             <div class="row">
-              <button id="btn-pick-refs" class="btn" type="button">Add reference image…</button>
+              <button id="btn-pick-refs" class="btn" type="button" data-i18n="action.addRefs">Add reference image…</button>
               <input id="ref-input" type="file" accept="image/*" multiple hidden />
             </div>
             <div id="refs-list" class="refs"></div>
             <div class="row">
-              <button id="btn-generate" class="btn btn-primary grow" type="button">Generate</button>
+              <button id="btn-generate" class="btn btn-primary grow" type="button" data-i18n="action.generate">Generate</button>
             </div>
             <p class="hint" id="gen-status"></p>
             <div id="gen-result" class="gen-result" hidden>
-              <img id="gen-image" alt="Generated result" />
+              <img id="gen-image" alt="Generated result" data-i18n-alt="generate.resultAlt" />
               <div class="gen-meta" id="gen-meta"></div>
             </div>
           </section>
@@ -171,12 +181,12 @@
           <section class="card">
             <div class="card-head card-head-row">
               <div>
-                <h2>History</h2>
+                <h2 data-i18n="history.title">History</h2>
                 <p id="history-sub">—</p>
               </div>
               <div class="row tight">
-                <button id="btn-history-refresh" class="btn btn-ghost" type="button">Refresh</button>
-                <button id="btn-history-clear" class="btn btn-danger" type="button">Clear</button>
+                <button id="btn-history-refresh" class="btn btn-ghost" type="button" data-i18n="action.refresh">Refresh</button>
+                <button id="btn-history-clear" class="btn btn-danger" type="button" data-i18n="action.clear">Clear</button>
               </div>
             </div>
             <div id="history-grid" class="gallery"></div>

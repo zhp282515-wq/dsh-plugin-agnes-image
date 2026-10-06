@@ -27,6 +27,7 @@ import {
 
 import {
   DEFAULT_SETTINGS,
+  LOCALES,
   normalizeSettings,
   loadSettings,
   saveSettings,
@@ -173,6 +174,21 @@ test('normalizeSettings keeps values that are legitimate', () => {
   assert.equal(kept.timeoutMs, 12345)
   assert.equal(kept.retries, 7)
   assert.equal(kept.saveHistory, false)
+})
+
+test('the UI language defaults to auto and rejects anything unknown', () => {
+  assert.equal(DEFAULT_SETTINGS.locale, 'auto', 'auto keeps following the shell')
+  assert.deepEqual([...LOCALES], ['auto', 'en', 'zh'])
+
+  assert.equal(normalizeSettings().locale, 'auto')
+  assert.equal(normalizeSettings({}).locale, 'auto')
+  assert.equal(normalizeSettings({ locale: 'zh' }).locale, 'zh')
+  assert.equal(normalizeSettings({ locale: 'en' }).locale, 'en')
+  assert.equal(normalizeSettings({ locale: 'auto' }).locale, 'auto')
+
+  for (const junk of ['fr', 'zh-CN', 'ZH', '', null, 42, {}, [], true]) {
+    assert.equal(normalizeSettings({ locale: junk }).locale, 'auto', `${JSON.stringify(junk)}`)
+  }
 })
 
 test('settings round-trip through disk, and report what changed', () => {

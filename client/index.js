@@ -39,9 +39,43 @@ window.__ModuleLoader__.load({
       return 'light'
     }
 
-    function consoleUrl() {
-      return `${CONSOLE_PATH}?theme=${currentTheme()}`
+    /**
+     * The console resolves `auto` from this hint. It has to come from here
+     * because the iframe cannot see the application's own locale, and its own
+     * `prefers-color-scheme`-style fallbacks follow the OS instead. The shell
+     * sets `<html lang>` when a locale is configured; the browser tag is the
+     * fallback.
+     */
+    function currentLang() {
+      try {
+        const tag = document.documentElement?.lang || navigator.language || ''
+        return String(tag).toLowerCase().startsWith('zh') ? 'zh' : 'en'
+      } catch {
+        return 'en'
+      }
     }
+
+    function consoleUrl() {
+      return `${CONSOLE_PATH}?theme=${currentTheme()}&lang=${currentLang()}`
+    }
+
+    const TEXT = {
+      en: {
+        summary:
+          'Model, defaults, API key, presets, history and a generation workbench. Changes apply to the next image immediately.',
+        open: 'Open in a new tab',
+        title: 'Agnes Image console',
+        section: 'Agnes Image',
+      },
+      zh: {
+        summary: '模型、默认参数、API 密钥、提示词预设、历史记录，以及一个生成工作台。改动对下一张图立即生效。',
+        open: '在新标签页打开',
+        title: 'Agnes 生图控制台',
+        section: 'Agnes 生图',
+      },
+    }
+
+    const text = () => TEXT[currentLang()]
 
     function ConsoleSection() {
       const [url] = React.useState(consoleUrl)
@@ -63,17 +97,17 @@ window.__ModuleLoader__.load({
           React.createElement(
             'p',
             { style: { margin: 0, fontSize: 12, opacity: 0.62, lineHeight: 1.5 } },
-            'Model, defaults, API key, presets, history and a generation workbench. Changes apply to the next image immediately.',
+            text().summary,
           ),
           React.createElement(
             'a',
             { href: url, target: '_blank', rel: 'noreferrer', style: { fontSize: 12, whiteSpace: 'nowrap' } },
-            'Open in a new tab',
+            text().open,
           ),
         ),
         React.createElement('iframe', {
           src: url,
-          title: 'Agnes Image console',
+          title: text().title,
           style: {
             width: '100%',
             minHeight: 560,
@@ -99,7 +133,7 @@ window.__ModuleLoader__.load({
               id: SECTION_ID,
               order: 500,
               // A function, not a string: the shell re-reads it on every projection.
-              label: () => 'Agnes Image',
+              label: () => text().section,
             },
             ConsoleSection,
           ),

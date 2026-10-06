@@ -129,6 +129,19 @@ code {
   flex-wrap: wrap;
 }
 
+/* The language picker rides in the topbar, so it matches the pill height
+   rather than the taller form selects — and it must not inherit the form
+   select's `width: 100%`, which would stretch it across the whole toolbar. */
+.topbar-actions select {
+  flex: 0 0 auto;
+  width: auto;
+  max-width: 110px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0 6px;
+  font-size: 12px;
+}
+
 .pill {
   display: inline-flex;
   align-items: center;
@@ -326,6 +339,7 @@ select.compact {
   font-family: inherit;
   font-size: 13px;
   font-weight: 500;
+  white-space: nowrap;
   cursor: pointer;
   white-space: nowrap;
   transition: background 0.12s ease, border-color 0.12s ease, opacity 0.12s ease;
@@ -583,10 +597,10 @@ select.compact {
   margin-bottom: 11px;
 }
 
-.presets:empty::after {
-  content: "No presets yet.";
-  font-size: 12px;
-  color: var(--muted);
+/* An empty preset list renders nothing: console.js writes a translated
+   placeholder element instead, because CSS cannot be localised. */
+.presets:empty {
+  display: block;
 }
 
 .preset {
@@ -633,10 +647,10 @@ select.compact {
   gap: 10px;
 }
 
-.gallery:empty::after {
-  content: "Nothing generated yet.";
-  font-size: 12px;
-  color: var(--muted);
+/* An empty gallery renders nothing at all — the History subtitle already
+   says so, in the reader's language. */
+.gallery:empty {
+  display: block;
 }
 
 .tile {
@@ -671,8 +685,8 @@ select.compact {
   opacity: 0.28;
 }
 
-.tile-bad::after {
-  content: "file missing";
+/* The "file missing" badge is a real element so its words can be localised. */
+.tile-badge {
   position: absolute;
   inset: 0 0 auto 0;
   padding: 5px 7px;

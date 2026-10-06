@@ -40,14 +40,25 @@
 
 | 分区 | 作用 |
 | --- | --- |
-| Active model | 选择工具默认使用哪个图像模型 |
-| Defaults | 档位 + 画幅，并实时预览原生像素尺寸 |
-| Output | 图片落盘目录，以及「打开文件夹」 |
-| API key | 掩码指纹与来源；替换或清除已存 Key；测试连通性；跑一次真实生成来验证 |
-| Advanced | 超时、重试次数、接口地址覆盖、历史开关 |
-| Prompt presets | 保存、复用、删除提示词模板 |
-| Generate | 完整工作台：预设、提示词、档位、画幅、模型、参考图上传、结果预览 |
-| History | 所有生成结果的缩略图画廊（工具调用的和控制台生成的都在内） |
+| 当前模型 | 选择工具默认使用哪个图像模型 |
+| 默认参数 | 档位 + 画幅，并实时预览原生像素尺寸 |
+| 输出 | 图片落盘目录，以及「打开文件夹」 |
+| API 密钥 | 掩码指纹与来源；替换或清除已存 Key；测试连通性；跑一次真实生成来验证 |
+| 高级 | 超时、重试次数、接口地址覆盖、历史开关 |
+| 提示词预设 | 保存、复用、删除提示词模板 |
+| 生成 | 完整工作台：预设、提示词、档位、画幅、模型、参考图上传、结果预览 |
+| 历史记录 | 所有生成结果的缩略图画廊（工具调用的和控制台生成的都在内） |
+
+控制台**中英双语**，用顶栏里的语言选择器切换。设置页的分区标签跟随 dsh 外壳自己的语言，
+所以分区会显示成 *Agnes Image* 或 *Agnes 生图*。`跟随界面`（默认）指「先跟外壳、再跟浏览器」；
+显式选 `English` 或 `中文` 会固定下来，并在重启后保留。
+
+<details>
+<summary>English console</summary>
+
+![English console](docs/console.png)
+
+</details>
 
 所有改动**下一次生成立即生效**，无需重启、无需重新挂载。插件在每次调用时实时合并配置，
 优先级从高到低：操作者在补丁层写的 `config` → 控制台保存的设置 → 内置默认值。
@@ -214,12 +225,17 @@ dsh-plugin-agnes-image/
 ## 开发
 
 ```bash
-node --test test/*.test.mjs          # 42 项测试，不联网，不需要 dsh
+node --test test/*.test.mjs          # 54 项测试，不联网，不需要 dsh
 ```
 
 测试覆盖的都是「出错时要么静默、要么危险」的部分：同源防护、设置的校验与往返、
 历史对损坏行的容忍、原生像素表自身的自洽性，以及浏览器半边的 loader 信封与槽位注册
 （在 `vm` 里配一个桩外壳执行）。
+
+`test/i18n.test.mjs` 值得单独说一句：它把 `console.js` 当文本读，一旦出现漏译、
+只有 `en` 没有 `zh` 的键、某一语言多出或少掉 `{placeholder}`、没人引用的死条目，
+或者**藏进字符串字面量 / CSS `content:` 里的用户可见句子**，就让构建失败。
+最后两类真的发过一次，是靠肉眼看截图发现的——这种 review 不该靠人工。
 
 冒烟测试会打真实接口，手动执行：
 
@@ -229,16 +245,25 @@ node scripts/smoke-image-to-image.mjs <reference.png>
 node scripts/smoke-tool.mjs
 ```
 
-迭代时给控制台截图：
+迭代控制台时**完全不必启动 dsh**：这个页面由插件自己的路由提供，可以独立跑，
+并且读写的就是同一份设置文件：
+
+```bash
+node scripts/preview-console.mjs               # http://127.0.0.1:8791/agnes-image/console
+node scripts/preview-console.mjs --port 9000
+```
+
+然后截图：
 
 ```bash
 chrome --headless=new --disable-gpu --hide-scrollbars \
-  --window-size=1500,1000 --virtual-time-budget=8000 \
-  --screenshot=console.png "http://127.0.0.1:19387/agnes-image/console?theme=dark"
+  --window-size=1500,1420 --virtual-time-budget=9000 \
+  --screenshot=console.png "http://127.0.0.1:8791/agnes-image/console?theme=dark&lang=zh"
 ```
 
 `?theme=light|dark` 覆盖配色；不带则跟随操作系统。宿主内嵌该页面时会把外壳主题传进去，
-因为在 iframe 里 `prefers-color-scheme` 跟的是操作系统而不是应用。
+因为在 iframe 里 `prefers-color-scheme` 跟的是操作系统而不是应用。`?lang=en|zh` 同理，
+但只在保存的偏好是「跟随界面」时生效——显式选择永远压过外壳的提示。
 
 ## 许可
 
