@@ -1,0 +1,6 @@
+# Normalize line endings on commit so the repository stays LF everywhere.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.webp binary

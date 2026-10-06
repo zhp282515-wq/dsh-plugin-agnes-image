@@ -1,0 +1,21 @@
+# Never commit a key. The plugin reads the key from the environment or from
+# ~/.dsh/agnes_key.txt, so no key file belongs in this repository.
+agnes_key.txt
+*.key
+.env
+
+# Generated output and any local scratch work.
+agnes-out/
+out/
+*.local.*
+
+# Editor / OS noise.
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and caches.
+*.log
+node_modules/

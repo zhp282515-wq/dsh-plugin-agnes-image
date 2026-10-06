@@ -1,0 +1,6 @@
+# dsh bundle layer: mount the Agnes Image 2.5 Flash generation tool.
+# Only appends a loader row; never re-declares an existing one (a patch row
+# replaces the whole config of the row it targets).
+- insert:
+    - id: agnes-image
+      name: 'dsh-plugin-agnes-image'

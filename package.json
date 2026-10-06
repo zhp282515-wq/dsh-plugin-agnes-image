@@ -1,0 +1,57 @@
+{
+  "name": "dsh-plugin-agnes-image",
+  "version": "1.1.0",
+  "private": true,
+  "description": "Agnes image generation for DeepSeek Harness (dsh): an agnes_image tool plus a settings-page console",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./client/index.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "client",
+    "console",
+    "docs",
+    "cordis.patch.yml",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "dsh",
+    "agnes",
+    "image-generation",
+    "text-to-image",
+    "image-to-image"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhp282515-wq/dsh-plugin-agnes-image.git"
+  },
+  "homepage": "https://github.com/zhp282515-wq/dsh-plugin-agnes-image#readme",
+  "bugs": {
+    "url": "https://github.com/zhp282515-wq/dsh-plugin-agnes-image/issues"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true
+    }
+  }
+}
