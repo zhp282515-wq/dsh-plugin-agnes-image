@@ -18,7 +18,7 @@
 | 能力 | 文生图、图生图、多图合成 |
 | 费用 | 撰写时全部档位与参考图免费 |
 
-![Agnes Image 控制台](docs/console.png)
+![Agnes Image 控制台](docs/console.zh-CN.png)
 
 ## 你得到什么
 
