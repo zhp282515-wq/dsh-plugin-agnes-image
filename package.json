@@ -1,6 +1,6 @@
 {
   "name": "dsh-plugin-agnes-image",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "description": "Agnes image generation for DeepSeek Harness (dsh): an agnes_image tool plus a settings-page console",
   "type": "module",

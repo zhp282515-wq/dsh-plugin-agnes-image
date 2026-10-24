@@ -35,6 +35,8 @@
 
 返回 `{ ok, path, url, bytes, model, size, ratio, nativePixels, prompt, revisedPrompt, keySource }`，
 并由 `output.render` 生成一段带 Markdown 图片引用的、给模型阅读的摘要。
+其中 `url`、`nativePixels`、`revisedPrompt` 是可选字段：接口没给出时直接省略，因为输出 schema
+每个字段只声明一个类型字符串（DSH 不接受 `['string', 'null']` 这种写法）。
 
 **二、控制台。** 「设置 → Agnes Image」：
 

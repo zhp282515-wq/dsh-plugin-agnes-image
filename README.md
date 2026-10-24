@@ -38,6 +38,8 @@ JSON result it can act on.
 
 Returns `{ ok, path, url, bytes, model, size, ratio, nativePixels, prompt, revisedPrompt, keySource }`,
 and renders a model-readable summary that includes a Markdown image reference.
+`url`, `nativePixels` and `revisedPrompt` are optional — they are left out when the API does not supply
+them, because the declared output schema carries a single type string per field (DSH rejects `['string', 'null']`).
 
 **2. The console.** Settings → **Agnes Image**:
 

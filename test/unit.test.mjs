@@ -366,3 +366,44 @@ test('clearHistory empties the log but leaves the images alone', () => {
     box.done()
   }
 })
+
+test("output schema stays inside DSH's JSON Schema subset", async () => {
+  // DSH rejects a schema whose property `type` is an array, so a union like
+  // ['string', 'null'] silently unregisters the whole tool at load time.
+  const { OUTPUT_SCHEMA } = await import('../lib/index.js')
+  const offenders = []
+
+  const walk = (node, at) => {
+    if (!node || typeof node !== 'object' || Array.isArray(node)) return
+    if ('type' in node) {
+      const { type } = node
+      if (typeof type !== 'string') offenders.push(`${at}.type must be one string, got ${JSON.stringify(type)}`)
+      else if (type === 'null') offenders.push(`${at}.type is null`)
+    }
+    for (const [key, child] of Object.entries(node.properties ?? {})) walk(child, `${at}.properties.${key}`)
+    if ('items' in node) walk(node.items, `${at}.items`)
+    for (const [key, child] of Object.entries(node.$defs ?? {})) walk(child, `${at}.$defs.${key}`)
+  }
+  walk(OUTPUT_SCHEMA, 'schema')
+
+  assert.deepEqual(offenders, [])
+  assert.deepEqual(
+    OUTPUT_SCHEMA.required.filter((name) => !(name in OUTPUT_SCHEMA.properties)),
+    [],
+    'every required name must be a declared property',
+  )
+})
+
+test('the three once-optional result fields are plain, optional strings', async () => {
+  // Regression for the schema-array fix: `url` / `nativePixels` / `revisedPrompt`
+  // used to be ['string', 'null']; they are now single-type and optional, and the
+  // tool omits them instead of sending null.
+  const { OUTPUT_SCHEMA } = await import('../lib/index.js')
+  for (const name of ['url', 'nativePixels', 'revisedPrompt']) {
+    assert.equal(OUTPUT_SCHEMA.properties[name].type, 'string', `${name} must be a single type string`)
+    assert.equal(OUTPUT_SCHEMA.required.includes(name), false, `${name} must stay optional`)
+  }
+  for (const name of ['ok', 'path', 'bytes', 'model', 'size', 'ratio', 'prompt']) {
+    assert.equal(OUTPUT_SCHEMA.required.includes(name), true, `${name} must stay required`)
+  }
+})
